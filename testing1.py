@@ -7,7 +7,7 @@ mnist = MNIST()
 # mnist.train_set.images  (60000, 784) (60000 images, 784 values for the 28*28 grid; arranged as array)
 # mnist.train_set.labels  (60000, 10) (60000 images, 10 different possible labels -one hot encoded (for deep learning))
 
-num1 = 4
+num1 = 9
 img1 = mnist.train_set.images[num1,:].reshape(28,28) # Take image num1+1 of the training set and reshape its array to a 28 * 28 grid
 img1 = np.rot90 (img1,-1,(0,1)) # rotate the image
 a = mnist.train_set.labels[num1,:] # assign the corresponding label to a
@@ -15,7 +15,7 @@ vol1 = np.tile(img1,(28,1,1)) # img1 is stacked on top of each other 28 times
 print(np.where(a == 1)[0][0]) # printing the position of label a which corresponds to the number in the img1
 # [0][0] converts it to an integer
 
-num2 = 9
+num2 = 7
 img2 = mnist.train_set.images[num2,:].reshape(28,28) # Take image num2+1 of training set and reshape its array to a 28*28 grid
 img2 = np.rot90 (img2,-1,(0,1)) # rotate image
 b = (mnist.train_set.labels[num2,:]) # assign the corresponding label to b
@@ -63,7 +63,24 @@ def printBauplan(cubegraph):
     for x in range(cubegraph.shape[0]): # check all combinations of x and y coordinates in cubegraph
         for y in range(cubegraph.shape[1]):
             v = g[cubegraph[x,y,:]] # g assigns a number from the array to each true value on the z axes (v) at point x,y
-            if len(v) > 0: # if there are true values, it prints them.
+            if len(v) > 0: # if there are true values, it prints the z coordinate of these values. (seen from bottom to top) 
                 print(x,y,v)
 
 printBauplan(cubegraph)
+
+# convert numpy array into STL file
+from skimage import measure # skimage is for image processing, measure can measure image properties
+from stl import mesh # import numpy-stl library
+
+# Generate vertices and faces using marching_cubes
+verts, faces, normals, values = measure.marching_cubes(cubegraph , spacing=(1, 1, 1))
+
+# Create the mesh
+surf = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
+for i, f in enumerate(faces):
+    for j in range(3):
+        surf.vectors[i][j] = verts[f[j], :]
+
+# Save as STL file
+surf.save('try.stl')
+
