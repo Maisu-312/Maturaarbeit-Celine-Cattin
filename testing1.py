@@ -1,11 +1,10 @@
 import numpy as np  # importing the numpy library
 from mnist import MNIST  # importing the mnist library
-
+import matplotlib.pyplot as plt  # import libraries to display the cube
 from PIL import Image
 
 # definition for importing drawings from photoshop:
 def photoshopimage(filepath): # Achtung! Beim Filepath \\ einfügen!
-    #
     pic = Image.open(filepath) # open the image
     pix = np.array(pic)# convert into an np. array
     pix = pix[:,:,0] < 32 # choose one layer of values and only keep the pixels with values lower than 32 (the black values)
@@ -13,7 +12,7 @@ def photoshopimage(filepath): # Achtung! Beim Filepath \\ einfügen!
 
 
 def mnistimage(num): # definition to import arrays of mnist
-    img = mnist.train_set.images[num, :].reshape(28,28)  # Take image num1+1 of the training set and reshape its array to a 28 * 28 grid
+    img = mnist.train_set.images[num, :].reshape(28,28)  # Take image num+1 of the training set and reshape its array to a 28 * 28 grid
     a = mnist.train_set.labels[num, :]  # assign the corresponding label to a
     print(np.where(a == 1)[0][0])  # printing the position of label a which corresponds to the number in the img1
     # [0][0] converts it to an integer
@@ -30,6 +29,26 @@ def perlenoptimieren(cube): # definition to minimize the number of points plotte
                     if sum(row) > 1 and sum(column) > 1: # Wenn in der gleichen Reihe und Spalte auch bereits eine 1 ist,
                         cube[x, y, z] = 0 # Dann wird die 1 zu einer 0 umgewandelt.
     return(cube)
+
+
+def optimizeAllSides(cube): # optimize the number of points starting from the 4 different sides of the cube
+    cube1 = perlenoptimieren(cube)
+    cube2 = np.rot90(cube, 1)
+    cube2 = perlenoptimieren(cube2)
+    cube3 = np.rot90(cube, 2)
+    cube3 = perlenoptimieren(cube3)
+    cube4 = np.rot90(cube, 3)
+    cube4 = perlenoptimieren(cube4)
+
+    sz = cube.shape
+    for z in range(sz[2]): # für jede Ebene die Anzahl Punkte zusammenzählen
+        a = np.sum(cube1[:, :, z])
+        b = np.sum(cube2[:, :, z])
+        c = np.sum(cube3[:, :, z])
+        d = np.sum(cube4[:, :, z])
+        min_index = np.argmin([a, b, c, d]) # Die Ebene herausgeben, die die minimalste Anzahl Punkte hat.
+    return(cube1,cube2,cube3,cube4)
+
 
 
 # training set with letters
@@ -58,15 +77,18 @@ cube = vol1 * vol2  # multiplying the two cubes of the two images
 cubegraph = cube > 0  # print only the points where there is a number > 1 (because 0 = no color, 1= black )
 cube[cubegraph] = 1.  # converting all values that are true in cubegraph to a 1.
 
-cube = perlenoptimieren(cube)
-cubegraph = cube > 0  # print only the points where there is a number > 1 (because 0 = no color, 1= black )
 
+
+cube1, cube2, cube3, cube4 = optimizeAllSides(cube) # Die 4 verschiedenen Cubes herausgeben.
+
+
+#cube = perlenoptimieren(cube)
+cubegraph = cube > 0  # print only the points where there is a number > 1 (because 0 = no color, 1= black )
 
 
 anzahlperlen = np.size(np.where(cubegraph == True))  # count the printed points
 print(anzahlperlen)
 
-import matplotlib.pyplot as plt  # import libraries to display the cube
 
 # Create a meshgrid for x, y, z coordinates
 x, y, z = np.meshgrid(np.arange(cubegraph.shape[0]),
@@ -96,8 +118,7 @@ def printBauplan(cubegraph):
 
     for x in range(cubegraph.shape[0]):  # check all combinations of x and y coordinates in cubegraph
         for y in range(cubegraph.shape[1]):
-            v = g[cubegraph[x, y,
-                  :]]  # g assigns a number from the array to each true value on the z axes (v) at point x,y
+            v = g[cubegraph[x, y,:]]  # g assigns a number from the array to each true value on the z axes (v) at point x,y
             if len(v) > 0:  # if there are true values, it prints the z coordinate of these values. (seen from bottom to top)
                 print(x, y, v)
 
