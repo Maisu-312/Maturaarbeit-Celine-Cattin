@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 import string
 import pandas as pd
 from testing1 import perlenoptimieren
+from testing1 import CalcMinCube
 
 def letterarray(text, debug = False): # A function to generate images (size 28*28) depicting a certain text
 
@@ -32,7 +33,7 @@ def letterarray(text, debug = False): # A function to generate images (size 28*2
 
 def averagepoints(): # Definition to collect the amoung of points of each possible pairing of the alphabet when going through the optimization functions
 
-    columns = ["Letters","None","Front", "Back","Left", "Right"] # Creating the columns for the data frame
+    columns = ["Letters","None","Front", "Back","Left", "Right", "Optimum"] # Creating the columns for the data frame
     df = pd.DataFrame(columns=columns) # Creating the data frame
 
     for x in range(26):
@@ -74,11 +75,15 @@ def averagepoints(): # Definition to collect the amoung of points of each possib
             perlenoptimieren(cube4)
             f = np.size(np.where(cube4 == 1))
 
-            new_row = {'Letters': a , 'None': b , 'Front': c , 'Back': e, 'Left' : f, 'Right': d} # Create a new row with the data from this image pair
+            optimum = CalcMinCube(cube)
+            g = np.size(np.where(optimum == 1))
+
+            new_row = {'Letters': a , 'None': b , 'Front': c , 'Back': e, 'Left' : f, 'Right': d, 'Optimum': g} # Create a new row with the data from this image pair
             df = df._append(new_row,ignore_index=True) # Add this row to the data frame
     return(df)
 
 capital_letters = string.ascii_uppercase[:]  # Save the uppercase capital letters in variable capital_letters
+
 
 df = averagepoints()
 df.to_excel("Statistic.xlsx") # Saving the data frame as an Excel sheet

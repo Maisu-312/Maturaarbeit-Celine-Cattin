@@ -72,25 +72,20 @@ def calculatemin (cube): # calculating the minimal number of points necessary to
         d = np.size(np.where(b > 0)) # Die Anzahl Spalten zusammenzählen in denen b > 0
 
         if c > d: # Je nachdem ob c oder d grösser ist, entspricht dies der minimaler möglicher Anzahl Punkte.
-            print(z, c)
+            print( "Ebene:", z,":", c)
             summe= summe+c
+
         else:
-            print(z, d)
+            print("Ebene",z, ":", d)
             summe = summe + d
-        return (a, b, c, d,summe)
-
-    print('Das Optimum besteht aus',summe,'Punkten.')
-
-
-
-
-
+    print("Das Optimum besteht aus",summe,"Punkten.")
+    return (a, b, c, d,summe)
 
 
 
 def CalcMinCube (cube): # calculating the minimal number of points necessary to display this model
     sz = cube.shape
-    optimum = np.zeros(sz)
+    optimum = np.zeros(sz) # creating a copy of cube, consisting only of 0's
     summeebene = 0
     for z in range(sz[2]): # für jede Ebene
         a = np.sum(cube[:,:,z],0) # Die Summe der Punkte in allen Reihen in x - Richtung zusammenzählen.
@@ -99,136 +94,129 @@ def CalcMinCube (cube): # calculating the minimal number of points necessary to 
         c = np.size(np.where(a > 0)) # Die Anzahl Reihen zusammenzählen, in denen a > 0
         d = np.size(np.where(b > 0)) # Die Anzahl Spalten zusammenzählen in denen b > 0
 
-        if c > d: # Je nachdem ob c oder d grösser ist, entspricht dies der minimaler möglicher Anzahl Punkte.
-            bb = np.zeros(b.shape)
+        if d >= c: # Je nachdem ob c oder d grösser ist, entspricht dies der minimalen möglicher Anzahl Punkte.
+            aa = np.zeros(a.shape)
             for x in range(sz[0]):
 
-                if a[x] > 0: # a an der Stelle x
-
+                if b[x] > 0: # a an der Stelle x
                     pointSetFlag = False
 
                     for y in range(sz[1]):
-
-                        if (cube[x,y,z]>0) and (bb[y] == 0):
+                        if (cube[x,y,z]>0) and (aa[y] == 0):
                             optimum[x, y, z] = 1
-                            bb[y] = +1
+                            aa[y] = +1
                             pointSetFlag = True
                             break
                     if pointSetFlag == False:
                         for y in range(sz[1]):
-                            if (cube[x, y, z] > 0) and (pointSetFlag == False):
+                            if (cube[x, y, z] > 0):
                                 optimum[x, y, z] = 1
-                                bb[y] = +1
+                                aa[y] = +1
                                 pointSetFlag = True
+                                break
 
+                        print()
 
         else: # man könnte den Würfel hier auch 90 Grad rotieren und das Selbe wie oben machen.
-            aa = np.zeros(a.shape)
+            bb = np.zeros(b.shape)
             for y in range(sz[1]):
-                if b[y]>0:
+                if a[y]>0:
                     pointSetFlag = False
 
                     for x in range(sz[0]):
 
-                        if (cube[x, y, z] > 0) and (aa[x] == 0):
+                        if (cube[x, y, z] > 0) and (bb[x] == 0):
                             optimum[x, y, z] = 1
-                            aa[x] = +1
+                            bb[x] = +1
                             pointSetFlag = True
                             break
                     if pointSetFlag == False:
                         for x in range(sz[0]):
-                            if (cube[x, y, z] > 0) and (pointSetFlag == False):
+                            if (cube[x, y, z] > 0):
                                 optimum[x, y, z] = 1
-                                aa[x] = +1
+                                bb[x] = +1
                                 pointSetFlag = True
-
-
-                    #if sum == summe :
-                       # continue
-                    #else:
-                        #print(z,'Ebene hat eine falsche Anzahl Punkte.')
+                                break
 
 
     return(optimum)
 
 
- # training set with letters
-mnist = MNIST()
-# mnist.train_set.images  (60000, 784) (60000 images, 784 values for the 28*28 grid; arranged as array)
-# mnist.train_set.labels  (60000, 10) (60000 images, 10 different possible labels -one hot encoded (for deep learning))
+if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich testing1 runnen lasse. Aber nicht, wenn ich es als Modul importiere.
+     # training set with letters
+    mnist = MNIST()
+    #mnist.train_set.images  #(60000, 784) #(60000 images, 784 values for the 28*28 grid; arranged as array)
+    #mnist.train_set.labels  (60000, 10) #(60000 images, 10 different possible labels -one hot encoded (for deep learning))
 
 
 
-img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\note1.png")
-img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\csharp.png")
+    #img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\note1.png")
+    #img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\csharp.png")
 
-#img1 = mnistimage(7)
-#img2 = mnistimage(9)
+    img1 = mnistimage(7)
+    img2 = mnistimage(9)
 
-img1 = np.rot90(img1, -1, (0, 1))  # rotate the image
-vol1 = np.tile(img1, (28, 1, 1))  # img1 is stacked on top of each other 28 times
-
-
-img2 = np.rot90(img2, -1, (0, 1))  # rotate image
-vol2 = np.tile(img2, (28, 1, 1))  # img2 ist stacked on top of each other 28 times
-vol2 = np.rot90(vol2, 1)  # rotate vol2 to show the number from another side as vol1
-# print(np.where(b == 1)[0][0])  # printing the position of label b which corresponds to the number of img2
-
-cube = vol1 * vol2  # multiplying the two cubes of the two images
-cubegraph = cube > 0  # print only the points where there is a number > 1 (because 0 = no color, 1= black )
-cube[cubegraph] = 1.  # converting all values that are true in cubegraph to a 1.
-
-#calculatemin(cube)
+    img1 = np.rot90(img1, -1, (0, 1))  # rotate the image
+    vol2 = np.tile(img1, (28, 1, 1))  # img1 is stacked on top of each other 28 times
 
 
-#cube1, cube2, cube3, cube4 = optimizeAllSides(cube) # Die 4 verschiedenen Cubes herausgeben.
+    img2 = np.rot90(img2, -1, (0, 1))  # rotate image
+    vol1 = np.tile(img2, (28, 1, 1))  # img2 ist stacked on top of each other 28 times
+    vol1 = np.rot90(vol1, 1)  # rotate vol2 to show the number from another side as vol1
+    # print(np.where(b == 1)[0][0])  # printing the position of label b which corresponds to the number of img2
+
+    cube = vol1 * vol2  # multiplying the two cubes of the two images
+    cubegraph = cube > 0  # print only the points where there is a number > 1 (because 0 = no color, 1= black )
+    cube[cubegraph] = 1.  # converting all values that are true in cubegraph to a 1.
+    calculatemin(cube)
 
 
-#cube = perlenoptimieren(cube)
-optimum = CalcMinCube(cube)
-cubegraph = optimum > 0  # print only the points where there is a number > 1 (because 0 = no color, 1= black )
+    #cube1, cube2, cube3, cube4 = optimizeAllSides(cube) # Die 4 verschiedenen Cubes herausgeben.
 
 
-anzahlperlen = np.size(np.where(cubegraph == True))  # count the printed points
-print(anzahlperlen)
+    #cube = perlenoptimieren(cube)
+    optimum = CalcMinCube(cube)
+    cubegraph = optimum > 0  # print only the points where there is a number > 0 (because 0 = no color, 1= black )
+
+    anzahlperlen = np.size(np.where(cubegraph == True))/3  # count the printed points. /3 because np.where gives all three coordinates for every point.
+    print("Die Anzahl Perlen ist:", anzahlperlen)
 
 
-# Create a meshgrid for x, y, z coordinates
-x, y, z = np.meshgrid(np.arange(cubegraph.shape[0]),
-                      # make a meshgrid 28*28 (the shape of cubegraph of the x axes(x=0))
-                      np.arange(cubegraph.shape[1]),
-                      np.arange(cubegraph.shape[2]))
+    # Create a meshgrid for x, y, z coordinates
+    x, y, z = np.meshgrid(np.arange(cubegraph.shape[0]),# make a meshgrid 28*28 (the shape of cubegraph of the x axes(x=0))
+                          np.arange(cubegraph.shape[1]),
+                          np.arange(cubegraph.shape[2]))
 
-# Create the 3D plot
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')  # put the plot in the field 111 (because I have only 1 plot)
+    # Create the 3D plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')  # put the plot in the field 111 (because I have only 1 plot)
 
-# Plot the points
-ax.scatter(x[cubegraph], y[cubegraph], z[cubegraph])  # plot the points where cubegraph is true
+    # Plot the points
+    ax.scatter(x[cubegraph], y[cubegraph], z[cubegraph])  # plot the points where cubegraph is true
 
-# Add labels
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
+    # Add labels
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
 
-# Show the plot
-plt.show()
+    # Show the plot
+    plt.show()
 
 
-printBauplan(cubegraph)
+    printBauplan(cubegraph)
 
-# convert numpy array into STL file
-from skimage import measure  # skimage is for image processing, measure can measure image properties
-from stl import mesh  # import numpy-stl library
+    # convert numpy array into STL file
+    from skimage import measure  # skimage is for image processing, measure can measure image properties
+    from stl import mesh  # import numpy-stl library
 
-# Generate vertices and faces using marching_cubes
-verts, faces, normals, values = measure.marching_cubes(cubegraph, spacing=(1, 1, 1))
+    # Generate vertices and faces using marching_cubes
+    verts, faces, normals, values = measure.marching_cubes(cubegraph, spacing=(1, 1, 1))
 
-# Create the mesh
-surf = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
-for i, f in enumerate(faces):
-    for j in range(3):
-        surf.vectors[i][j] = verts[f[j], :]
+    # Create the mesh
+    surf = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
+    for i, f in enumerate(faces):
+        for j in range(3):
+            surf.vectors[i][j] = verts[f[j], :]
 
-# Save as STL file
-surf.save('try.stl')
+    # Save as STL file
+    surf.save('try.stl')
