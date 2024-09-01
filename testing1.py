@@ -150,11 +150,13 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
 
 
 
-    #img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\note1.png")
-    #img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\csharp.png")
+    img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\Mann.png")
+    img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\Frau.png")
 
-    img1 = mnistimage(7)
-    img2 = mnistimage(9)
+    #img1 = mnistimage(7)
+    #img2 = mnistimage(9)
+
+
 
     img1 = np.rot90(img1, -1, (0, 1))  # rotate the image
     vol2 = np.tile(img1, (28, 1, 1))  # img1 is stacked on top of each other 28 times
@@ -165,9 +167,20 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
     vol1 = np.rot90(vol1, 1)  # rotate vol2 to show the number from another side as vol1
     # print(np.where(b == 1)[0][0])  # printing the position of label b which corresponds to the number of img2
 
+    a = np.sum(img1, 0)  # Die Summe der Punkte in allen Spalten in y - Richtung zusammenzählen.
+    b = np.sum(img2, 0)  # Die Summe der Punkte in allen Spalten in y - Richtung zusammenzählen.
+    c = np.sign(a)  # Alle Werte > 0 werden in eine 1 umgewandelt, die anderen in eine 0
+    d = np.sign(b)
+
+    if not np.all(c == d):  # Kleine Kontrollfunktion falls eine Ansicht, leere Ebenen hat und somit einen Teil der anderen Ansicht auslöscht.
+         print("Die Ansicht ist unvollständig.")
+
+
     cube = vol1 * vol2  # multiplying the two cubes of the two images
     cubegraph = cube > 0  # print only the points where there is a number > 1 (because 0 = no color, 1= black )
     cube[cubegraph] = 1.  # converting all values that are true in cubegraph to a 1.
+
+
     calculatemin(cube)
 
 
@@ -175,12 +188,13 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
 
 
     #cube = perlenoptimieren(cube)
-    optimum = CalcMinCube(cube)
-    cubegraph = optimum > 0  # print only the points where there is a number > 0 (because 0 = no color, 1= black )
+    #optimum = CalcMinCube(cube)
+    cubegraph = cube > 0  # print only the points where there is a number > 0 (because 0 = no color, 1= black )
 
     anzahlperlen = np.size(np.where(cubegraph == True))/3  # count the printed points. /3 because np.where gives all three coordinates for every point.
     print("Die Anzahl Perlen ist:", anzahlperlen)
 
+    printBauplan(cubegraph)
 
     # Create a meshgrid for x, y, z coordinates
     x, y, z = np.meshgrid(np.arange(cubegraph.shape[0]),# make a meshgrid 28*28 (the shape of cubegraph of the x axes(x=0))
@@ -202,8 +216,6 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
     # Show the plot
     plt.show()
 
-
-    printBauplan(cubegraph)
 
     # convert numpy array into STL file
     from skimage import measure  # skimage is for image processing, measure can measure image properties
