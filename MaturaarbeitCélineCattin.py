@@ -6,7 +6,7 @@ from PIL import Image
 # definition for importing drawings from photoshop:
 def photoshopimage(filepath): # Achtung! Beim Filepath \\ einfügen!
     pic = Image.open(filepath) # open the image
-    pix = np.array(pic) # convert into an np. array
+    pix = np.array(pic) # convert into a np. array
     pix = pix[:,:,0] < 32 # choose one layer of values and only keep the pixels with values lower than 32 (the black values)
     return(1*pix) # 1 * pix to convert the true and false values into 1 and 0
 
@@ -38,7 +38,20 @@ def printBauplan(cubegraph):
         for y in range(cubegraph.shape[1]):
             v = g[cubegraph[x, y,:]]  # g assigns a number from the array to each true value on the z axes (v) at point x,y
             if len(v) > 0:  # if there are true values, it prints the z coordinate of these values. (seen from bottom to top)
-                print(x, y, v)
+                ebene = (x, y, v)
+                print(ebene)
+
+def Modellbau(cubegraph): # prints graphically construction plan for the pearlmodels
+    for x in range(cubegraph.shape[0]-1,-1,-1): # for each layer when the cube is flipped
+        Ebene = ""
+        for y in range(cubegraph.shape[1]):  # check all combinations of y and z coordinates in cubegraph
+            for z in range(cubegraph.shape[2]):
+                if cubegraph[x,y,z]==1: # if there is a value, add X to the string. These are where the pearls will be.
+                    Ebene += " X"
+                else:
+                    Ebene += " ."
+            Ebene += "\n"
+        print(Ebene)
 
 
 def optimizeAllSides(cube): # optimize the number of points starting from the 4 different sides of the cube
@@ -150,8 +163,8 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
 
 
 
-    img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\Mann.png")
-    img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\Frau.png")
+    img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\a.png")
+    img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\c.png")
 
     #img1 = mnistimage(7)
     #img2 = mnistimage(9)
@@ -159,11 +172,11 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
 
 
     img1 = np.rot90(img1, -1, (0, 1))  # rotate the image
-    vol2 = np.tile(img1, (28, 1, 1))  # img1 is stacked on top of each other 28 times
+    vol2 = np.tile(img1, (img1.shape[0], 1, 1))  # img1 is stacked on top of each other the number of times equal the length of the img1
 
 
     img2 = np.rot90(img2, -1, (0, 1))  # rotate image
-    vol1 = np.tile(img2, (28, 1, 1))  # img2 ist stacked on top of each other 28 times
+    vol1 = np.tile(img2, (img2.shape[0], 1, 1))  # img2 ist stacked on top of each other the number of times equal the length of the img2.
     vol1 = np.rot90(vol1, 1)  # rotate vol2 to show the number from another side as vol1
     # print(np.where(b == 1)[0][0])  # printing the position of label b which corresponds to the number of img2
 
@@ -187,14 +200,14 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
     #cube1, cube2, cube3, cube4 = optimizeAllSides(cube) # Die 4 verschiedenen Cubes herausgeben.
 
 
-    #cube = perlenoptimieren(cube)
+    cube = perlenoptimieren(cube)
     #optimum = CalcMinCube(cube)
     cubegraph = cube > 0  # print only the points where there is a number > 0 (because 0 = no color, 1= black )
 
     anzahlperlen = np.size(np.where(cubegraph == True))/3  # count the printed points. /3 because np.where gives all three coordinates for every point.
     print("Die Anzahl Perlen ist:", anzahlperlen)
-
-    printBauplan(cubegraph)
+    Modellbau(cubegraph)
+    #printBauplan(cubegraph)
 
     # Create a meshgrid for x, y, z coordinates
     x, y, z = np.meshgrid(np.arange(cubegraph.shape[0]),# make a meshgrid 28*28 (the shape of cubegraph of the x axes(x=0))
