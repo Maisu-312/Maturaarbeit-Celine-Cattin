@@ -130,7 +130,7 @@ def CalcMinCube (cube): # calculating the minimal number of points necessary to 
 
                         print()
 
-        else: # man könnte den Würfel hier auch 90 Grad rotieren und das Selbe wie oben machen.
+        else: # man könnte den Würfel hier auch 90 Grad rotieren und das Selbe wie oben machen und das Resultat anschliessend zurück rotieren.
             bb = np.zeros(b.shape)
             for y in range(sz[1]):
                 if a[y]>0:
@@ -155,6 +155,69 @@ def CalcMinCube (cube): # calculating the minimal number of points necessary to 
     return(optimum)
 
 
+def randomCalcMinCube (cube): # Randomizing the pearl distribution in CalcMinCube
+    sz = cube.shape
+    optimum = np.zeros(sz) # creating a copy of cube, consisting only of 0's
+    for z in range(sz[2]): # für jede Ebene
+        a = np.sum(cube[:,:,z],0) # Die Summe der Punkte in allen Reihen in x - Richtung zusammenzählen.
+        b = np.sum(cube[:,:,z],1) # Die Summe der Punkte in allen Spalten in y - Richtung zusammenzählen.
+
+        c = np.size(np.where(a > 0)) # Die Anzahl Reihen zusammenzählen, in denen a > 0
+        d = np.size(np.where(b > 0)) # Die Anzahl Spalten zusammenzählen in denen b > 0
+
+        if d >= c: # Je nachdem ob c oder d grösser ist, entspricht dies der minimalen möglicher Anzahl Punkte.
+            aa = np.zeros(a.shape)
+            for x in range(sz[0]):
+                if b[x] > 0: # b an der Stelle x
+                    pointlist = np.array([], dtype = 'int') # Eine leere Liste erzeugen
+                    for y in range(sz[1]): # Alle Punkte in dieser Spalte/Zeile durchgehen
+                        if (cube[x,y,z]>0): # Wenn es im Originalcube dort einen Punkt hat, so wird diese y-Stelle in die Liste aufgenommen.
+                            pointlist = np.append(pointlist,y)
+
+                    np.random.shuffle(pointlist) # Die Elemente der Liste mischen.
+                    pointSetFlag = False
+                    for y in list(pointlist): # Jedes Element der Liste durchgehen.
+                        if aa[y] == 0: # Wenn es in dieser Zeile noch keinen anderen Punkt hat,
+                            optimum[x, y, z] = 1 #... so wird hier der Punkt gesetzt.
+                            aa[y] = +1 # Damit in Zukunft keine Punkte mehr in diese Zeile gesetzt werden, wird an dieser Stelle im aa eine 1 gesetzt.
+                            pointSetFlag = True
+                            break
+                    if pointSetFlag == False: # Wenn kein Punkt gesetzt wurde, so heisst das, dass es in jeder Zeile bereits einen Punkt gab.
+                        y = pointlist[0] # Dann ist es eigentlich egal, wo der Punkt gesetzt wird. Nehmen wir einfach [0]
+                        optimum[x,y,z]=1
+                        #aa[y]= +1
+
+
+        else: # Der selbe Prozess wie oben, nur dass wir von einer anderen Seite her durch die Punkte gehen.
+            bb = np.zeros(b.shape)
+            for y in range(sz[1]):
+                if a[y]>0:
+                    pointlist = np.array([], dtype='int')
+                    for x in range(sz[0]):
+                        if (cube[x, y, z] > 0):
+                            pointlist = np.append(pointlist,x)
+
+                    np.random.shuffle(pointlist)
+                    pointSetFlag = False
+                    for x in list(pointlist):
+                        if bb[x] == 0:
+                            optimum[x, y, z] = 1
+                            bb[x] = +1
+                            pointSetFlag = True
+                            break
+                    if pointSetFlag == False:
+                            x = pointlist[0]
+                            optimum[x, y, z] = 1
+                            #bb[x] = +1
+
+
+
+    return(optimum)
+
+
+
+
+
 if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich testing1 runnen lasse. Aber nicht, wenn ich es als Modul importiere.
      # training set with letters
     mnist = MNIST()
@@ -163,8 +226,8 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
 
 
 
-    img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\a.png")
-    img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\c.png")
+    img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\C.png")
+    img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\A.png")
 
     #img1 = mnistimage(7)
     #img2 = mnistimage(9)
@@ -200,9 +263,9 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
     #cube1, cube2, cube3, cube4 = optimizeAllSides(cube) # Die 4 verschiedenen Cubes herausgeben.
 
 
-    cube = perlenoptimieren(cube)
-    #optimum = CalcMinCube(cube)
-    cubegraph = cube > 0  # print only the points where there is a number > 0 (because 0 = no color, 1= black )
+    #cube = perlenoptimieren(cube)
+    optimum = randomCalcMinCube(cube)
+    cubegraph = optimum > 0  # print only the points where there is a number > 0 (because 0 = no color, 1= black )
 
     anzahlperlen = np.size(np.where(cubegraph == True))/3  # count the printed points. /3 because np.where gives all three coordinates for every point.
     print("Die Anzahl Perlen ist:", anzahlperlen)
