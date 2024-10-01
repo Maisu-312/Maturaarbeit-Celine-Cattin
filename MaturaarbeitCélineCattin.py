@@ -2,6 +2,7 @@ import numpy as np  # importing the numpy library
 from mnist import MNIST  # importing the mnist library
 import matplotlib.pyplot as plt  # import libraries to display the cube
 from PIL import Image
+import heapq
 
 # definition for importing drawings from photoshop:
 def photoshopimage(filepath): # Achtung! Beim Filepath \\ einfügen!
@@ -228,7 +229,6 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
 
     img1 = photoshopimage("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\C.png")
     img2 = photoshopimage ("C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\A.png")
-
     #img1 = mnistimage(7)
     #img2 = mnistimage(9)
 
@@ -257,15 +257,17 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
     cube[cubegraph] = 1.  # converting all values that are true in cubegraph to a 1.
 
 
-    calculatemin(cube)
+    #calculatemin(cube)
 
 
     #cube1, cube2, cube3, cube4 = optimizeAllSides(cube) # Die 4 verschiedenen Cubes herausgeben.
 
 
     #cube = perlenoptimieren(cube)
-    optimum = randomCalcMinCube(cube)
-    cubegraph = optimum > 0  # print only the points where there is a number > 0 (because 0 = no color, 1= black )
+    #optimum = CalcMinCube(cube)
+    #cube = shortest_path_3d(cube,(0,0,0),(9,9,9))
+    #visualize_path(cube,cube)
+    cubegraph = cube > 0  # print only the points where there is a number > 0 (because 0 = no color, 1= black )
 
     anzahlperlen = np.size(np.where(cubegraph == True))/3  # count the printed points. /3 because np.where gives all three coordinates for every point.
     print("Die Anzahl Perlen ist:", anzahlperlen)
@@ -290,15 +292,15 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
     ax.set_zlabel('Z')
 
     # Show the plot
+    plt.title('Model')
     plt.show()
-
 
     # convert numpy array into STL file
     from skimage import measure  # skimage is for image processing, measure can measure image properties
     from stl import mesh  # import numpy-stl library
-
+    cubegraphpadded = np.pad(cubegraph, pad_width=1, mode='constant', constant_values=0) # adding a layer of 0 on each side of the cube in order to have the outer surfaces be included in the stl file.
     # Generate vertices and faces using marching_cubes
-    verts, faces, normals, values = measure.marching_cubes(cubegraph, spacing=(1, 1, 1))
+    verts, faces, normals, values = measure.marching_cubes(cubegraphpadded, spacing=(1, 1, 1))
 
     # Create the mesh
     surf = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
