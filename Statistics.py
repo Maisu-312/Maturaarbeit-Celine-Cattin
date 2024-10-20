@@ -7,10 +7,10 @@ import numpy as np  # importing the numpy library
 from PIL import Image, ImageDraw, ImageFont
 import string
 import pandas as pd
-from testing1 import perlenoptimieren
-from testing1 import CalcMinCube
+from MaturaarbeitCélineCattin import perlenoptimieren
+from MaturaarbeitCélineCattin import CalcMinCube
 
-def letterarray(text, debug = False): # A function to generate images (size 28*28) depicting a certain text
+def letterarray(text, debug = True): # A function to generate images (size 28*28) depicting a certain text
 
     img = Image.new(mode="RGB", size=(64, 64), color= (255,255,255)) # Creating a white image
 
