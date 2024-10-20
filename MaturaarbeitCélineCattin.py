@@ -2,6 +2,7 @@ import numpy as np  # importing the numpy library
 from mnist import MNIST  # importing the mnist library
 import matplotlib.pyplot as plt  # import libraries to display the cube
 from PIL import Image
+import math
 import heapq
 
 # definition for importing drawings from photoshop:
@@ -215,6 +216,29 @@ def randomCalcMinCube (cube): # Randomizing the pearl distribution in CalcMinCub
 
     return(optimum)
 
+def calcrandom (cube): # Die Anzahl Möglichkeiten, um das Optimum darzustellen, ausrechnen.
+    sz = cube.shape
+    pointlist = np.array([], dtype='int')  # Eine leere Liste erzeugen
+    for z in range(sz[2]):  # für jede Ebene
+        a = np.sum(cube[:, :, z], 0)  # Die Summe der Punkte in allen Reihen in x - Richtung zusammenzählen.
+        b = np.sum(cube[:, :, z], 1)  # Die Summe der Punkte in allen Spalten in y - Richtung zusammenzählen.
+
+        c = np.size(np.where(a > 0))  # Die Anzahl Reihen zusammenzählen, in denen a > 0
+        d = np.size(np.where(b > 0))  # Die Anzahl Spalten zusammenzählen in denen b > 0
+        möglichkeiten = 0.0
+
+        if d >= c: # Wenn d grösser oder gleich c ist, so entspricht c der Breite des Schnittflächenrechtecks und d der Länge.
+            e = math.factorial(c) * c^(d-c) # Formel der Anzahl Möglichkeiten pro Ebene
+            möglichkeiten = möglichkeiten + e
+            pointlist = np.append(pointlist, möglichkeiten) # Die Anzahl Möglichkeiten in einer Liste speichern.
+        else: # Wenn c grösser als d ist, so entspricht d der Breite und c der Länge.
+            f = math.factorial(d) * d^(c-d) # Formel der Anzahl Möglichkeiten pro Ebene
+            möglichkeiten = möglichkeiten + f
+            pointlist = np.append(pointlist, möglichkeiten) # Die Anzahl Möglichkeiten in einer Liste speichern.
+        print(möglichkeiten)
+    total = np.prod(pointlist) # Anzahl Möglichkeiten der einzelnen Ebenen miteinander multiplizieren.
+    print("Diese Modell hat", total ,"Möglichkeiten, um das Optimum darzustellen.")
+
 
 
 
@@ -262,7 +286,7 @@ if __name__ == "__main__": # Dieser untere Teil wird nur ausgeführt, wenn ich t
 
     #cube1, cube2, cube3, cube4 = optimizeAllSides(cube) # Die 4 verschiedenen Cubes herausgeben.
 
-
+    calcrandom(cube)
     #cube = perlenoptimieren(cube)
     #optimum = CalcMinCube(cube)
     #cube = shortest_path_3d(cube,(0,0,0),(9,9,9))
