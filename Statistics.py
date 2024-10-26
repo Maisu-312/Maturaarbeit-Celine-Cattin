@@ -1,89 +1,112 @@
-# def letterarray generates images (size 28*28) depicting a certain text.
-# def averagepoints generates all possible pairs of the uppercase letters, turns them into images using def letterarray
-#   and then applies all optimization functions storing the data in a data frame and excel sheet.
-# The aim is to have an overview of how effective these optimization functions are in average.
+##################################################################
+# Programmteil "Statistics"
+# Anhand aller Buchstabenkombinationen der Grossbuchstaben wird
+# statistisch ausgewertet,(komma?) wie effektiv die einzelnen Optimierungsalgorithmen durchschnittlich sind.
 
-import numpy as np  # importing the numpy library
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import string
 import pandas as pd
-from MaturaarbeitCélineCattin import perlenoptimieren
-from MaturaarbeitCélineCattin import CalcMinCube
+from MaturaarbeitCélineCattin import PerlenOptimieren
+from MaturaarbeitCélineCattin import PlotMinCube
 
-def letterarray(text, debug = True): # A function to generate images (size 28*28) depicting a certain text
+### Start Konfiguration
 
-    img = Image.new(mode="RGB", size=(64, 64), color= (255,255,255)) # Creating a white image
+# Die Bilder darstellen:
+picture = False
 
-    draw = ImageDraw.Draw(img) # Depicting the image
-    font = ImageFont.truetype('arial.ttf', 64) # Setting the font and size
+# Eine Excel Tabelle mit den Daten ausgeben:
+excel = True
+
+# Ende Konfiguration
 
 
-    draw.text((0,0), text, fill = "black", font = font) # Drawing the text
-    bbox = font.getbbox(text) # Calculating the bounding box of the given text
-    img1 = img.crop(bbox) # Cropping the image to the size of this bounding box
+#################################################################
+# Funktion LetterArray(text)
+#   Input:  text - eine Stellenangabe aus einem Buchstabenstring oder einfach ein Buchstabe ?
+#   Output: Bild des Buchstabens als 28 * 28 NumPy-Array
+#   Beschreibung: Generiert Bilder mit einem spezifischen Text als 28 * 28 NumPy-Array.
+def LetterArray(text):
 
-    img2 = img1.resize((28, 28))  # Resizing the image to the size of 28 * 28
+    img = Image.new(mode="RGB", size=(64, 64), color=(255, 255, 255))  # Ein weisses Bild erstellen - muss nach jedem Satz ein Punkt hin?
+    draw = ImageDraw.Draw(img)  # Das weisse Bild darstellen
+    font = ImageFont.truetype('arial.ttf', 64)  # Den Font und die Schriftgrösse einstellen
 
-    if debug: # Only showing the image if debug = True.
+    draw.text((0, 0), text, fill="black", font=font)  # Den Text zeichnen
+    bbox = font.getbbox(text)  # Die Zeichen-Box des Textes berechnen
+    img1 = img.crop(bbox)  # Das Bild auf die Grösse der Zeichen-Box schneiden
+
+    img2 = img1.resize((28, 28))  # Zu einem 28*28 Array in der Grösse ändern.
+
+    if picture:  # Die Bilder darstellen ( ist das gut formuliert so?) , wenn picture = True ist. (= oder == ?)
         img2.show()
 
-    return (img2)
+    return (img2)  # Das Bild des Buchstabens zurückgeben.
 
 
+#################################################################
+# Funktion AveragePoints()
+#   Input:  Keiner
+#   Output: Ein data frame mit den Anzahl Punkten für jedes Paar für alle Optimierungsalgorithmen
+#   Beschreibung:  Speichern der Anzahl Punkte für alle möglichen Paare von Grossbuchstaben beim Durchgehen durch jeden Optimierungsmechanismus.
 
-def averagepoints(): # Definition to collect the amoung of points of each possible pairing of the alphabet when going through the optimization functions
+def AveragePoints():
 
-    columns = ["Letters","None","Front", "Back","Left", "Right", "Optimum"] # Creating the columns for the data frame
-    df = pd.DataFrame(columns=columns) # Creating the data frame
+    columns = ["Letters","None","Front", "Back","Left", "Right", "Optimum"]  # Die Spalten des data frames erstellen
+    df = pd.DataFrame(columns=columns)  # Das data frame erstellen
 
     for x in range(26):
-        for y in range (26): # For all possible pairings of two images (in this case the uppercase letters):
-            a = capital_letters[x]+capital_letters[y] # Printing the two letters into the first column
-            print(a)
+        for y in range(26):  # Für alle möglichen Paare von zwei Bildern ( In diesem Fall von Grossbuchstaben)
+            a = capital_letters[x]+capital_letters[y]  # Die beiden Buchstaben in die erste Spalte "Letters" speichern
+            print(a)  # Das Buchstabenpaar ausgeben
 
-            img1 = letterarray(capital_letters[x])
-            img2 = letterarray(capital_letters[y])
+            img1 = LetterArray(capital_letters[x]) #  Mit Hilfe der Funktion letterarray aus dem Buchstaben ein Bild erstellen.
+            img2 = LetterArray(capital_letters[y])
 
-            pix = np.array(img1)
-            img1 = pix[:, :, 0]   # Choosing one layer of the RGB picture
+            pix = np.array(img1)  # img1 in ein NumPy-Array umwandeln (weshalb ist das nötig?)
+            img1 = pix[:, :, 0]  # Aus dem RGB Bild eine Ebene aussuchen
 
-            pix2 = np.array(img2)
-            img2 = pix2[:, :,0]
+            pix2 = np.array(img2)  # img2 in ein NumPy-Array umwandeln
+            img2 = pix2[:, :, 0]  # Aus dem RGB Bild eine Ebene aussuchen
 
-            vol1 = np.tile(img1, (28, 1, 1))  # img1 is stacked on top of each other 28 times
-            vol2 = np.tile(img2, (28, 1, 1))  # img2 ist stacked on top of each other 28 times
-            vol2 = np.rot90(vol2, 1)  # Rotate vol2 to show the text from another side as vol1
+            vol1 = np.tile(img1, (28, 1, 1))  # img1 28 Mal aufeinanderstappeln, um einen Würfel zu bilden
+            vol2 = np.tile(img2, (28, 1, 1))  # img2 28 Mal aufeinanderstappeln, um einen Würfel zu bilden
+            vol2 = np.rot90(vol2, 1)  # vol2 um 90 Grad rotieren, um das Bild von einer anderen Seite als vol1 darzustellen
 
-            cube = vol1 * vol2  # Multiplying the two cubes of the two images
-            cubegraph = cube > 0  # Print only the points where there is a number > 1 (because 0 = no color, 1= black )
-            cube[cubegraph] = 1.  # Converting all values that are true in cubegraph to a 1.
+            cube = vol1 * vol2  # Die Würfel der beiden Bilder miteinander multiplizieren
+            cubegraph = cube > 0  # Nur Punkte darstellen, in denen eine Zahl > 1 ist. ( denn 0 = weiss , 1 = schwarz)
+            cube[cubegraph] = 1.  # Alle Werte, die true sind in cubegraph in eine 1 umwandeln.
 
-            b = np.size(np.where(cubegraph == 1))  # Count the printed points with no optimization function
+            b = np.size(np.where(cubegraph == 1))  # Die Anzahl Punkte ohne Optimierungsverfahren zählen und in der zweiten Spalte "none" speichern.
 
-            perlenoptimieren(cube)
-            c = np.size(np.where(cube == 1))  # Count the printed points after the perlenoptimieren function
+            ####### Den Würfel durch das erste Optimierungsverfahren lassen
+            PerlenOptimieren(cube)
+            c = np.size(np.where(cube == 1))  # Die Anzahl Punkte nach dem Verfahren zählen und in der dritten Spalte "Front" speichern.
 
-            cube2 = np.rot90(cube, 1) # Rotate the cube to start the perlenoptimieren function from another side
-            perlenoptimieren(cube2)
-            d = np.size(np.where(cube2 == 1 ))
+            ####### Für das zweite Optimierungsverfahren wird der Würfel von allen Seiten her durch die Funktion perlenoptimieren gelassen, um die Anzahl Punkte zu vergleichen.
+            cube2 = np.rot90(cube, 1)  # Den Würfel ein Mal um 90 Grad im Gegenuhrzeigersinn drehen rotieren,
+            PerlenOptimieren(cube2)  # um die Funktion perlenoptimieren von einer anderen Seite her zu starten.
+            f = np.size(np.where(cube2 == 1))  # Die Anzahl Punkte in der Spalte "Right" speichern
 
-            cube3 = np.rot90(cube, 2)
-            perlenoptimieren(cube3)
-            e = np.size(np.where(cube3 == 1))
+            cube3 = np.rot90(cube, 2)  # Würfel zwei Mal rotieren, um von hinten zu starten
+            PerlenOptimieren(cube3)
+            d = np.size(np.where(cube3 == 1))  # Die Anzahl Punkte in der Spalte "Back" speichern
 
-            cube4 = np.rot90(cube, 3)
-            perlenoptimieren(cube4)
-            f = np.size(np.where(cube4 == 1))
+            cube4 = np.rot90(cube, 3)  # Den Würfel drei Mal rotieren
+            PerlenOptimieren(cube4)
+            e = np.size(np.where(cube4 == 1))  # Die Anzahl Punkte in der Spalte "Left" speichern
 
-            optimum = CalcMinCube(cube)
-            g = np.size(np.where(optimum == 1))
+            ###### Würfel durch das dritte Optimierungsverfahren lassen
+            optimum = PlotMinCube(cube)
+            g = np.size(np.where(optimum == 1))  # Die Anzahl Punkte in der Spalte "Optimum" speichern
 
-            new_row = {'Letters': a , 'None': b , 'Front': c , 'Back': e, 'Left' : f, 'Right': d, 'Optimum': g} # Create a new row with the data from this image pair
-            df = df._append(new_row,ignore_index=True) # Add this row to the data frame
-    return(df)
-
-capital_letters = string.ascii_uppercase[:]  # Save the uppercase capital letters in variable capital_letters
+            new_row = {'Letters': a, 'None': b, 'Front': c, 'Back': e, 'Left': f, 'Right': d, 'Optimum': g}  # Eine neue Spalte erstellen mit den Daten von diesem Buchstabenpaar.
+            df = df._append(new_row, ignore_index=True)  # Diese neue Zeile zum data frame hinzufügen
+    return (df)
 
 
-df = averagepoints()
-df.to_excel("Statistic.xlsx") # Saving the data frame as an Excel sheet
+capital_letters = string.ascii_uppercase[:]  # Die Grossbuchstaben in der Variabel capital_letters speichern
+df = AveragePoints()  # Die Funktion averagepoints aufrufen
+
+if excel == True:
+    df.to_excel("Statistic.xlsx")  # Das data frame als Excel Tabelle abspeichern
