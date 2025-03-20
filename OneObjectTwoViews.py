@@ -19,12 +19,12 @@ from skimage.morphology import skeletonize
 # Bilder Auswahl: Format: png, Zahl bedeutet Index in MNIST, String = Filename von zu ladendem Bild,
 # Wenn man nur zwei Bilder möchte, beim Dritten "None" schreiben
 # Achtung: Beim Filename muss der Pfad mit \\ untertrennt sein!
-# Siehe Beispiel: "C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\C.png"
-imageA = "C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\A.png"
-imageB = "C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\B.png"
-imageC = "C:\\Users\\Celine\\Documents\\Kanti Jahr 3\\Maturaarbeit\\png files\\A.png"
+# Siehe Beispiel: "images\\C.png"
+imageA = "images\\A.png"
+imageB = "images\\B.png"
+imageC = "images\\C.png"
 
-# Grösse der Bilder (in Pixel): (nur quadratisches Format möglich)
+# Grösse des Modelles (in Pixel): (nur quadratisches Format möglich)
 size = (10,10)
 
 # Threshold der Farbwerte: ( 0 <= threshold <= 1)
@@ -36,23 +36,23 @@ threshold_imageC = 0.5
 # 3 = Optimum Drittes Verfahren, 4 = Willkürliches Optimum
 Optimierungsalgorithmus = 0
 
-# Anzahl geplotteter Punkte ausgegeben:
-AnzahlPunkte = True
+# Modell als STL-File ausgeben:
+STL = False
+
+# Modell als Drahtfigur visualisieren:
+Drahtmodel = False
 
 # Drucken des Bauplanes für die Perlenmodelle:
 PrintBauplan = False
+
+# Anzahl geplotteter Punkte ausgegeben:
+AnzahlPunkte = True
 
 # Anzahl Punkte im Optimum ausgeben:
 MinimalePunkte = False
 
 # Ausrechnen der Anzahl Möglichkeiten, um das Optimum darzustellen:
 AnzahlMöglichkeiten = False
-
-# Modell als STL-File ausgeben:
-STL = False
-
-# Modell als Drahtfigur visualisieren:
-Drahtmodel = True
 
 # Ende Konfiguration
 

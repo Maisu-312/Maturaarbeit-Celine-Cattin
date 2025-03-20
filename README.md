@@ -23,7 +23,7 @@ This project is part of a Maturaarbeit (final thesis) by Céline Amélie Cattin,
 
 2. Run the script:
    ```
-   python maturaarbeit_celine_cattin.py
+   python OneObjectTwoViews.py
    ```
 
 3. Build or print the model :)
