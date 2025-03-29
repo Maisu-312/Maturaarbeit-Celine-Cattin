@@ -20,9 +20,9 @@ from skimage.morphology import skeletonize
 # Wenn man nur zwei Bilder möchte, beim Dritten "None" schreiben
 # Achtung: Beim Filename muss der Pfad mit \\ untertrennt sein!
 # Siehe Beispiel: "images\\C.png"
-imageA = "images\\A.png"
-imageB = "images\\B.png"
-imageC = "images\\C.png"
+imageA = "images\\C.png"
+imageB = "images\\A.png"
+imageC = "images\\B.png"
 
 # Grösse des Modelles (in Pixel): (nur quadratisches Format möglich)
 size = (10,10)
@@ -37,7 +37,7 @@ threshold_imageC = 0.5
 Optimierungsalgorithmus = 0
 
 # Modell als STL-File ausgeben:
-STL = False
+STL = True
 
 # Modell als Drahtfigur visualisieren:
 Drahtmodel = False
@@ -63,7 +63,8 @@ AnzahlMöglichkeiten = False
 #   Output: Bild als NumPy-Array
 #   Beschreibung: Lädt das num-te Bild aus dem MNIST Datensatz
 def MnistImage(num):
-    img = mnist.train_set.images[num, :].reshape(28, 28)  # Bild num+1 aus Trainingsset in ein 28*28 Array umformen
+    img = mnist.train_set.images[num, :].reshape(28,28)  # Bild num+1 aus Trainingsset in ein 28*28 Array umformen
+    img = resize(img, size, anti_aliasing=True) # Das Bild in die richtige Grösse resizen
     a = mnist.train_set.labels[num, :]  # Zugehöriges Label von num wird a zugeordnet
     print(np.where(a == 1)[0][0])  # Position von Label a drucken, welche der Ziffer aus dem Bild entspricht
     return(img) # Zugehöriges MNIST Bild ausgeben
@@ -361,7 +362,7 @@ def Modellbau(cube):
 
 
 ############################################################
-# Funktion Drahtmodel
+# Funktion skeletonizeCube
 #   Input: cube - Das dreidimensionale NumPy-Array der Motive
 #   Output: Visualisierung des auf Drahtbreite reduzierten Modells
 #   Beschreibung: Reduziert das Modell auf sein Skelett.
@@ -537,4 +538,4 @@ if __name__ == "__main__":  # Damit der untere Teil nicht ausgeführt wird, wenn
             for j in range(3):
                 surf.vectors[i][j] = verts[f[j], :]
 
-        surf.save('try.stl')  # Als STL-File unter dem Namen 'try.stl' abspeichern
+        surf.save('example.stl')  # Als STL-File unter dem Namen 'try.stl' abspeichern
