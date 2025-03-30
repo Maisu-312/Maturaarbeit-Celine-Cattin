@@ -37,13 +37,13 @@ threshold_imageC = 0.5
 Optimierungsalgorithmus = 0
 
 # Modell als STL-File ausgeben:
-STL = True
+STL = False
 
 # Modell als Drahtfigur visualisieren:
-Drahtmodel = False
+Drahtmodel = True
 
 # Drucken des Bauplanes für die Perlenmodelle:
-PrintBauplan = False
+PrintBauplan = True
 
 # Anzahl geplotteter Punkte ausgegeben:
 AnzahlPunkte = True
@@ -487,8 +487,8 @@ if __name__ == "__main__":  # Damit der untere Teil nicht ausgeführt wird, wenn
     else:
         print("Ungültige Eingabe für den Optimierungsalgorithmus")
 
-    if PrintBauplan == True:
-        Modellbau(cube)
+    if Drahtmodel == True:
+        cube = skeletonizeCube(cube)
 
     if AnzahlPunkte == True:
         anzahlperlen = np.size(np.where(cube == True)) / 3  # Anzahl geplotteter Punkte zählen.
@@ -501,8 +501,8 @@ if __name__ == "__main__":  # Damit der untere Teil nicht ausgeführt wird, wenn
     if AnzahlMöglichkeiten == True:
         CalcRandom(cube)
 
-    if Drahtmodel == True:
-        cube = skeletonizeCube(cube)
+    if PrintBauplan == True:
+        Modellbau(cube)
 
     # Das Modell darstellen:
     # Meshgrid für die x, y, z Koordinaten erzeugen
