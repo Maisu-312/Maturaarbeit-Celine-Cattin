@@ -40,10 +40,10 @@ Optimierungsalgorithmus = 0
 STL = False
 
 # Modell als Drahtfigur visualisieren:
-Drahtmodel = True
+Drahtmodel = False
 
 # Drucken des Bauplanes für die Perlenmodelle:
-PrintBauplan = True
+PrintBauplan = False
 
 # Anzahl geplotteter Punkte ausgegeben:
 AnzahlPunkte = True
