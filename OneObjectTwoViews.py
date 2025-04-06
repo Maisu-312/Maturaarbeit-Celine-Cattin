@@ -12,6 +12,12 @@ from skimage import measure
 from stl import mesh
 from skimage.transform import resize
 from skimage.morphology import skeletonize
+import argparse
+
+
+parser = argparse.ArgumentParser(description="Visualize a model with these images")
+parser.add_argument('nums', nargs='*')
+args = parser.parse_args()
 
 
 ### Start Konfiguration
@@ -20,9 +26,22 @@ from skimage.morphology import skeletonize
 # Wenn man nur zwei Bilder möchte, beim Dritten "None" schreiben
 # Achtung: Beim Filename muss der Pfad mit \\ untertrennt sein!
 # Siehe Beispiel: "images\\C.png"
-imageA = "images\\C.png"
-imageB = "images\\A.png"
-imageC = "images\\B.png"
+imageA = None
+imageB = None
+imageC = None
+if len(args.nums) == 0:
+    imageA = "images\\S.png"
+    imageB = "images\\S.png"
+    imageC = "images\\S.png"
+elif len(args.nums) == 2:
+    imageA = f'images\\%s.png' % args.nums[0]
+    imageB = f'images\\%s.png' % args.nums[1]
+elif len(args.nums) == 3:
+    imageA = f'images\\%s.png' % args.nums[0]
+    imageB = f'images\\%s.png' % args.nums[1]
+    imageC = f'images\\%s.png' % args.nums[2]
+else:
+    exit(-1)
 
 # Grösse des Modelles (in Pixel): (nur quadratisches Format möglich)
 size = (10,10)
@@ -81,8 +100,10 @@ def LoadImage(filepath,threshold):
     pix = np.array(pic)  # In ein np.array konvertieren
 
     pix = resize(pix, size,  anti_aliasing=True )
-
-    pix = pix[:, :, 0] < threshold # Eine Ebene von Werte aussuchen und Pixel behalten mit Werten < threshhold (schwarze Werte)
+    if pix.ndim == 2:
+        pix = pix[:,:] > threshold
+    else:
+        pix = pix[:, :, 0] < threshold # Eine Ebene von Werte aussuchen und Pixel behalten mit Werten < threshhold (schwarze Werte)
     return(1*pix) # 1 * pix um true und false Werte in 1 und 0 umzuwandeln
 
 
