@@ -28,6 +28,11 @@ This project is part of a Maturaarbeit (final thesis) by Céline Amélie Cattin,
 
 3. Build or print the model :)
 
+## Further links
+
+Already pre-calculated models can be found here: 
+https://makerworld.com/en/models/1286936-number-50-double-perspetive-object
+
 ## License
 
 MIT License 
